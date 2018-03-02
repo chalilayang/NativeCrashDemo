@@ -38,30 +38,31 @@ static int mpid;
 void crash_sigaction(int signal, siginfo *info, void *reserved) {
     LOG("native- my_sigaction recived");
     int iPid = getpid();
-    jclass cls = sigEnv->FindClass("com/flash/nativecatch/NativeHandler");
+    jclass cls = sigEnv->FindClass("chalilayang/com/nativecrashdemo/NativeCrashHandler");
     jmethodID tempmethodID = sigEnv->GetMethodID(cls, "onNativeCrash", "()V");
     switch (signal) {
         case SIGTRAP:
-            LOG("native- SIGABRT recived");
-            if (mpid == iPid) {
-                sigEnv->CallVoidMethod(sigObj, tempmethodID);
-                mold_handler.sa_sigaction(signal, info, reserved);
-            } else {
-                mold_handlers[8].sa_sigaction(signal, info, reserved);
-            }
+            LOG("native- SIGTRAP recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
             break;
         case SIGABRT:
-        case SIGSEGV:
-        case SIGILL:
             LOG("native- SIGABRT recived");
             sigEnv->CallVoidMethod(sigObj, tempmethodID);
-            mold_handler.sa_sigaction(signal, info, reserved);
+            break;
+        case SIGSEGV:
+            LOG("native- SIGSEGV recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
+            break;
+        case SIGILL:
+            LOG("native- SIGILL recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
             break;
         default:
             LOG("native- other signal");
-            mold_handler.sa_sigaction(signal, info, reserved);
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
             break;
     }
+    mold_handler.sa_sigaction(signal, info, reserved);
 }
 
 //初始化 设置信号拦截器
