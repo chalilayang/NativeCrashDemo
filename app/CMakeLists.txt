@@ -8,6 +8,9 @@ cmake_minimum_required(VERSION 3.4.1)
 #设置生成的so动态库最后输出的路径
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/jniLibs/${ANDROID_ABI})
 
+# configure import libs
+set(CPP_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src/main/cpp)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -57,6 +60,26 @@ add_library( # Sets the name of the library.
 
 target_link_libraries( # Specifies the target library.
                        native-crash-handler
+
+                       # Links the target library to the log library
+                       # included in the NDK.
+                       ${log-lib} )
+
+add_library( # Sets the name of the library.
+             coffeecatch
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             src/main/cpp/coffeecatch/coffeecatch.c
+             src/main/cpp/coffeecatch/coffeejni.c)
+
+target_include_directories(coffeecatch PRIVATE
+                           src/main/cpp/coffeecatch)
+
+target_link_libraries( # Specifies the target library.
+                       coffeecatch
 
                        # Links the target library to the log library
                        # included in the NDK.
