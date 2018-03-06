@@ -83,6 +83,7 @@
 
 #include <stdint.h>
 #include <sys/types.h>
+#include <android/log.h>
 
 #ifdef __cplusplus
 extern "C" {

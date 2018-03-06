@@ -3,20 +3,16 @@
 //
 
 #include <jni.h>
-#include <android/log.h>
 #include <signal.h>
 #include <unistd.h>
 #include <sstream>
 #include <string.h>
-#include "coffeecatch/coffeejni.h"
 #include "coffeecatch/coffeecatch.h"
+#include "customlog.h"
 
-#define TAG "native-crash-activity.cpp"
-#define LOG(str) __android_log_print(ANDROID_LOG_DEBUG,TAG,str)
-
-jint call_dangerous_function(JNIEnv* env, jobject object) {
+jint call_dangerous_function(JNIEnv *env, jobject object) {
     // ... do dangerous things!
-    int * dd = NULL;
+    int *dd = NULL;
     *dd = 0;
     return 42;
 }
@@ -30,17 +26,13 @@ JNIEXPORT jint
 JNICALL
 Java_chalilayang_com_nativecrashdemo_NativeCrashHandler_createNativeException(JNIEnv *env,
                                                                               jobject thiz) {
-    COFFEE_TRY() {
-        LOG("COFFEE");
-        int e = 8;
-        int r = 0;
-        e / r;
-        LOG("COFFEE end");
-    } COFFEE_CATCH() {
-        coffeecatch_throw_exception(env);
-//        coffeecatch_cancel_pending_alarm();
-    } COFFEE_END();
-//    coffeecatch_throw_exception(env);
+    if (coffeecatch_inside()) {
+        LOG("coffeecatch_inside");
+        call_dangerous_function(env, thiz);
+    } else if (coffeecatch_setup() == 0 && sigsetjmp(*coffeecatch_get_ctx(), 1) == 0) {
+        LOG("coffeecatch_setup");
+        call_dangerous_function(env, thiz);
+    }
     return 5;
 
 }

@@ -54,6 +54,7 @@
 #include <pthread.h>
 #include <dlfcn.h>
 #include "coffeecatch.h"
+#include "../customlog.h"
 
 /*#define NDK_DEBUG 1*/
 #if ( defined(NDK_DEBUG) && ( NDK_DEBUG == 1 ) )
@@ -582,8 +583,8 @@ int coffeecatch_cancel_pending_alarm() {
  * We record the siginfo_t context in this function each time it is being
  * called, to be able to know what error caused an issue.
  */
-static void coffeecatch_signal_pass(const int code, siginfo_t *const si,
-                                    void *const sc) {
+static void coffeecatch_signal_pass(const int code, siginfo_t *const si, void *const sc) {
+  LOGP("coffeecatch_signal_pass %d", code);
   native_code_handler_struct *t;
 
   DEBUG(print("caught signal\n"));
@@ -620,8 +621,8 @@ static void coffeecatch_signal_pass(const int code, siginfo_t *const si,
 
 /* Internal crash handler for abort(). Java calls abort() if its signal handler
  * could not resolve the signal ; thus calling us through this handler. */
-static void coffeecatch_signal_abort(const int code, siginfo_t *const si,
-                                            void *const sc) {
+static void coffeecatch_signal_abort(const int code, siginfo_t *const si, void *const sc) {
+  LOGP("coffeecatch_signal_abort %d", code);
   native_code_handler_struct *t;
 
   (void) sc; /* UNUSED */
@@ -698,6 +699,7 @@ static int coffeecatch_handler_setup_global(void) {
     }
 
     DEBUG(print("installed global signal handlers\n"));
+    LOG("installed global signal handlers\n");
   }
 
   /* OK. */
@@ -773,7 +775,7 @@ static native_code_handler_struct* coffeecatch_native_code_handler_struct_init(v
 #endif
   }
 #endif
-
+  LOGP("native_code_handler_struct_init %d ", t);
   return t;
 }
 
@@ -1363,6 +1365,7 @@ void coffeecatch_get_backtrace_info(void (*fun)(void *arg,
 int coffeecatch_inside() {
   native_code_handler_struct *const t = coffeecatch_get();
   if (t != NULL && t->reenter > 0) {
+    LOGP("coffeecatch_inside t->reenter %d ",t->reenter);
     t->reenter++;
     return 1;
   }
