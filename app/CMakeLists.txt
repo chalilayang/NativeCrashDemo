@@ -50,22 +50,6 @@ target_link_libraries( # Specifies the target library.
                        ${log-lib} )
 
 add_library( # Sets the name of the library.
-             native-crash-handler
-
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-             src/main/cpp/native_crash_handler.cpp )
-
-target_link_libraries( # Specifies the target library.
-                       native-crash-handler
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
-
-add_library( # Sets the name of the library.
              coffeecatch
 
              # Sets the library as a shared library.
@@ -83,4 +67,21 @@ target_link_libraries( # Specifies the target library.
 
                        # Links the target library to the log library
                        # included in the NDK.
+                       ${log-lib} )
+
+add_library( # Sets the name of the library.
+             native-crash-handler
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             src/main/cpp/native_crash_handler.cpp )
+
+target_link_libraries( # Specifies the target library.
+                       native-crash-handler
+
+                       # Links the target library to the log library
+                       # included in the NDK.
+                       coffeecatch
                        ${log-lib} )

@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <sstream>
 #include <string.h>
+#include "coffeecatch/coffeejni.h"
+#include "coffeecatch/coffeecatch.h"
 
 #define TAG "native-crash-activity.cpp"
 #define LOG(str) __android_log_print(ANDROID_LOG_DEBUG,TAG,str)
@@ -57,12 +59,31 @@ void crash_sigaction(int signal, siginfo *info, void *reserved) {
             LOG("native- SIGILL recived");
             sigEnv->CallVoidMethod(sigObj, tempmethodID);
             break;
+        case SIGFPE:
+            LOG("native- SIGFPE recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
+            break;
+        case SIGBUS:
+            LOG("native- SIGBUS recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
+            break;
+        case SIGKILL:
+            LOG("native- SIGKILL recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
+            break;
+        case SIGSTOP:
+            LOG("native- SIGSTOP recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
+            break;
+        case SIGTERM:
+            LOG("native- SIGTERM recived");
+            sigEnv->CallVoidMethod(sigObj, tempmethodID);
+            break;
         default:
             LOG("native- other signal");
             sigEnv->CallVoidMethod(sigObj, tempmethodID);
             break;
     }
-    mold_handler.sa_sigaction(signal, info, reserved);
 }
 
 //初始化 设置信号拦截器
@@ -76,26 +97,37 @@ void minitSigaction() {
     }
 }
 
+jint call_dangerous_function(JNIEnv* env, jobject object) {
+    // ... do dangerous things!
+    int * dd = NULL;
+    *dd = 0;
+    return 42;
+}
 
-extern "C"
-{
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 JNIEXPORT jboolean
 JNICALL
 Java_chalilayang_com_nativecrashdemo_NativeCrashHandler_createNativeException(JNIEnv *env,
-                                                                              jobject) {
-    __android_log_print(ANDROID_LOG_DEBUG, TAG, "divideZero()");
-    int e = 8;
-    e / 0;
-    __android_log_print(ANDROID_LOG_DEBUG, TAG, "divideZeroEnd()");
+                                                                              jobject thiz) {
+//    LOG("COFFEE");
+//    int * dd = NULL;
+//    LOG("COFFEE end");
 }
 
 JNIEXPORT void
 JNICALL
 Java_chalilayang_com_nativecrashdemo_NativeCrashHandler_initNativeHandler(JNIEnv *zenv,
                                                                           jobject thiz, int pid) {
-    sigEnv = zenv;
-    sigObj = (sigEnv)->NewGlobalRef(thiz);
-    mpid = pid;
-    minitSigaction();
+//    sigEnv = zenv;
+//    sigObj = (sigEnv)->NewGlobalRef(thiz);
+//    mpid = pid;
+//    minitSigaction();
 }
+
+#ifdef __cplusplus
 }
+#endif

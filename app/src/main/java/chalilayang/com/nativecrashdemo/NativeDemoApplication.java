@@ -28,7 +28,7 @@ public class NativeDemoApplication extends Application {
         super.onCreate();
         String processName = getCurrentProcessName();
         crashHandler = new NativeCrashHandler();
-        crashHandler.initNativeHandler(android.os.Process.myPid());
+//        crashHandler.initNativeHandler(android.os.Process.myPid());
         Log.i(TAG, "onCreate: " + processName);
     }
 

@@ -9,6 +9,7 @@ import android.util.Log;
 public class NativeCrashHandler {
     private static final String TAG = NativeCrashHandler.class.getSimpleName();
     static {
+        System.loadLibrary("coffeecatch");
         System.loadLibrary("native-crash-handler");
     }
 
