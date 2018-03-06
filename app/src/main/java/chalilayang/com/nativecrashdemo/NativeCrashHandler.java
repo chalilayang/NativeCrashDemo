@@ -1,7 +1,5 @@
 package chalilayang.com.nativecrashdemo;
 
-import android.util.Log;
-
 /**
  * Created by chalilayang on 2018/3/2.
  */
@@ -12,12 +10,5 @@ public class NativeCrashHandler {
         System.loadLibrary("coffeecatch");
         System.loadLibrary("native-crash-handler");
     }
-
-    public void onNativeCrash() {
-        Log.i(TAG, "onNativeCrash: ");
-    }
-
-    public native boolean createNativeException();
-
-    public native void initNativeHandler(int pid);
+    public native int createNativeException();
 }

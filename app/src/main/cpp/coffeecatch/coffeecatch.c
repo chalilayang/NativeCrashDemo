@@ -562,8 +562,7 @@ static void coffeecatch_copy_context(native_code_handler_struct *const t,
 /* Return the thread-specific native_code_handler_struct structure, or
  * @c null if no such structure is available. */
 static native_code_handler_struct* coffeecatch_get() {
-  return (native_code_handler_struct*)
-      pthread_getspecific(native_code_thread);
+  return (native_code_handler_struct*) pthread_getspecific(native_code_thread);
 }
 
 int coffeecatch_cancel_pending_alarm() {

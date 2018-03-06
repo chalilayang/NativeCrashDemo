@@ -1,6 +1,7 @@
 package chalilayang.com.nativecrashdemo;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import chalilayang.com.nativelibrary.NativeCrashTest;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
@@ -30,9 +32,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                int dd = new NativeCrashHandler().createNativeException();
+                Log.i(TAG, "onClick: " + dd);
+                Snackbar.make(view, "Replace with your own action " + dd, Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                new NativeCrashHandler().createNativeException();
             }
         });
 
