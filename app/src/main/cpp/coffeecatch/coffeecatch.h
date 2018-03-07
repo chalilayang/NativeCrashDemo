@@ -213,6 +213,7 @@ extern int coffeecatch_inside(void);
 extern int coffeecatch_setup(void);
 extern sigjmp_buf* coffeecatch_get_ctx(void);
 extern void coffeecatch_cleanup(void);
+extern void coffeecatch_try_cleanup(void);
 #define COFFEE_TRY()                                \
   if (coffeecatch_inside() || \
       (coffeecatch_setup() == 0 \

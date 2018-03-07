@@ -469,6 +469,7 @@ static void coffeecatch_try_jump_userland(native_code_handler_struct*
   (void) si; /* UNUSED */
   (void) sc; /* UNUSED */
 
+  LOG("coffeecatch_try_jump_userland 0");
   /* Valid context ? */
   if (t != NULL && t->ctx_is_set) {
     DEBUG(print("calling siglongjmp()\n"));
@@ -496,6 +497,7 @@ static void coffeecatch_try_jump_userland(native_code_handler_struct*
      * define the behavior when any unsafe function is called in a signal
      * handler that interrupts an unsafe function."
      */
+    LOG("coffeecatch_try_jump_userland siglongjmp");
     siglongjmp(t->ctx, code);
   }
 }
@@ -591,7 +593,7 @@ static void coffeecatch_signal_pass(const int code, siginfo_t *const si, void *c
 
   /* Call the "real" Java handler for JIT and internals. */
   coffeecatch_call_old_signal_handler(code, si, sc);
-
+  LOG("coffeecatch_signal_pass step 1");
   /* Still here ?
    * FIXME TODO: This is the Dalvik behavior - but is it the SunJVM one ? */
 
@@ -599,21 +601,24 @@ static void coffeecatch_signal_pass(const int code, siginfo_t *const si, void *c
    * (signal() and alarm() are signal-safe) */
   signal(code, SIG_DFL);
   coffeecatch_start_alarm();
-
+  LOG("coffeecatch_signal_pass step 2");
   /* Available context ? */
   t = coffeecatch_get();
   if (t != NULL) {
+    LOG("coffeecatch_signal_pass step 3");
     /* An alarm() call was triggered. */
     coffeecatch_mark_alarm(t);
 
     /* Take note of the signal. */
     coffeecatch_copy_context(t, code, si, sc);
 
+    LOG("coffeecatch_signal_pass step 4");
     /* Back to the future. */
     coffeecatch_try_jump_userland(t, code, si, sc);
   }
 
   /* Nope. (abort() is signal-safe) */
+  LOG("coffeecatch_signal_pass step 5");
   DEBUG(print("calling abort()\n"));
   signal(SIGABRT, SIG_DFL);
   abort();
@@ -1401,6 +1406,20 @@ void coffeecatch_cleanup() {
     t->ctx_is_set = 0;
     coffeecatch_handler_cleanup();
   }
+}
+
+/**
+ * Calls coffeecatch_handler_cleanup()
+ */
+void coffeecatch_try_cleanup() {
+  native_code_handler_struct *const t = coffeecatch_get();
+  if (t == NULL) {
+    return;
+  }
+  if (t->reenter <= 0) {
+    return;
+  }
+  coffeecatch_cleanup();
 }
 
 sigjmp_buf* coffeecatch_get_ctx() {
