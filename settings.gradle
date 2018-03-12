@@ -1,1 +1,1 @@
-include ':app', ':nativelibrary'
+include ':app', ':nativelibrary', 'gen-libs'
