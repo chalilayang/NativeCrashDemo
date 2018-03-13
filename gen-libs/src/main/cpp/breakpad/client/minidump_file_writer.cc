@@ -60,7 +60,7 @@ void CheckNeedsFTruncateWorkAround(int file) {
 
   // Attempt an idempotent truncate that chops off nothing and see if we
   // run into any sort of errors.
-  off_t offset = sys_lseek(file, 0, SEEK_END);
+  off_t offset = lseek(file, 0, SEEK_END);
   if (offset == -1) {
     // lseek failed. Don't apply work around. It's unlikely that we can write
     // to a minidump with either method.
@@ -104,7 +104,7 @@ MinidumpFileWriter::~MinidumpFileWriter() {
 bool MinidumpFileWriter::Open(const char *path) {
   assert(file_ == -1);
 #if defined(__linux__) && __linux__
-  file_ = sys_open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
+  file_ = open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
 #else
   file_ = open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
 #endif
@@ -135,7 +135,7 @@ bool MinidumpFileWriter::Close() {
     }
 #endif
 #if defined(__linux__) && __linux__
-    result = (sys_close(file_) == 0);
+    result = (close(file_) == 0);
 #else
     result = (close(file_) == 0);
 #endif
@@ -318,8 +318,8 @@ bool MinidumpFileWriter::Copy(MDRVA position, const void *src, ssize_t size) {
 
   // Seek and write the data
 #if defined(__linux__) && __linux__
-  if (sys_lseek(file_, position, SEEK_SET) == static_cast<off_t>(position)) {
-    if (sys_write(file_, src, size) == size) {
+  if (lseek(file_, position, SEEK_SET) == static_cast<off_t>(position)) {
+    if (write(file_, src, size) == size) {
       return true;
     }
   }

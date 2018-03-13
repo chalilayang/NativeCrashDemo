@@ -63,13 +63,13 @@
 static bool SuspendThread(pid_t pid) {
   // This may fail if the thread has just died or debugged.
   errno = 0;
-  if (sys_ptrace(PTRACE_ATTACH, pid, NULL, NULL) != 0 &&
+  if (ptrace(PTRACE_ATTACH, pid, NULL, NULL) != 0 &&
       errno != 0) {
     return false;
   }
-  while (sys_waitpid(pid, NULL, __WALL) < 0) {
+  while (waitpid(pid, NULL, __WALL) < 0) {
     if (errno != EINTR) {
-      sys_ptrace(PTRACE_DETACH, pid, NULL, NULL);
+      ptrace(PTRACE_DETACH, pid, NULL, NULL);
       return false;
     }
   }
@@ -98,7 +98,7 @@ static bool SuspendThread(pid_t pid) {
 
 // Resumes a thread by detaching from it.
 static bool ResumeThread(pid_t pid) {
-  return sys_ptrace(PTRACE_DETACH, pid, NULL, NULL) >= 0;
+  return ptrace(PTRACE_DETACH, pid, NULL, NULL) >= 0;
 }
 
 namespace google_breakpad {
@@ -140,7 +140,7 @@ bool LinuxPtraceDumper::CopyFromProcess(void* dest, pid_t child,
 
   while (done < length) {
     const size_t l = (length - done > word_size) ? word_size : (length - done);
-    if (sys_ptrace(PTRACE_PEEKDATA, child, remote + done, &tmp) == -1) {
+    if (ptrace(PTRACE_PEEKDATA, child, remote + done, &tmp) == -1) {
       tmp = 0;
     }
     my_memcpy(local + done, &tmp, l);
@@ -154,12 +154,12 @@ bool LinuxPtraceDumper::ReadRegisterSet(ThreadInfo* info, pid_t tid)
 #ifdef PTRACE_GETREGSET
   struct iovec io;
   info->GetGeneralPurposeRegisters(&io.iov_base, &io.iov_len);
-  if (sys_ptrace(PTRACE_GETREGSET, tid, (void*)NT_PRSTATUS, (void*)&io) == -1) {
+  if (ptrace(PTRACE_GETREGSET, tid, (void*)NT_PRSTATUS, (void*)&io) == -1) {
     return false;
   }
 
   info->GetFloatingPointRegisters(&io.iov_base, &io.iov_len);
-  if (sys_ptrace(PTRACE_GETREGSET, tid, (void*)NT_FPREGSET, (void*)&io) == -1) {
+  if (ptrace(PTRACE_GETREGSET, tid, (void*)NT_FPREGSET, (void*)&io) == -1) {
     return false;
   }
   return true;
@@ -208,7 +208,7 @@ bool LinuxPtraceDumper::GetThreadInfoByIndex(size_t index, ThreadInfo* info) {
   if (!BuildProcPath(status_path, tid, "status"))
     return false;
 
-  const int fd = sys_open(status_path, O_RDONLY, 0);
+  const int fd = open(status_path, O_RDONLY, 0);
   if (fd < 0)
     return false;
 
@@ -227,7 +227,7 @@ bool LinuxPtraceDumper::GetThreadInfoByIndex(size_t index, ThreadInfo* info) {
 
     line_reader->PopLine(line_len);
   }
-  sys_close(fd);
+  close(fd);
 
   if (info->ppid == -1 || info->tgid == -1)
     return false;
@@ -347,7 +347,7 @@ bool LinuxPtraceDumper::EnumerateThreads() {
   if (!BuildProcPath(task_path, pid_, "task"))
     return false;
 
-  const int fd = sys_open(task_path, O_RDONLY | O_DIRECTORY, 0);
+  const int fd = open(task_path, O_RDONLY | O_DIRECTORY, 0);
   if (fd < 0)
     return false;
   DirectoryReader* dir_reader = new(allocator_) DirectoryReader(fd);
@@ -369,7 +369,7 @@ bool LinuxPtraceDumper::EnumerateThreads() {
     dir_reader->PopEntry();
   }
 
-  sys_close(fd);
+  close(fd);
   return true;
 }
 

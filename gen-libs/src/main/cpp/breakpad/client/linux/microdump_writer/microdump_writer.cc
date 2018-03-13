@@ -35,6 +35,7 @@
 #include <limits>
 
 #include <sys/utsname.h>
+#include <cstring>
 
 #include "client/linux/dump_writer_common/thread_info.h"
 #include "client/linux/dump_writer_common/ucontext_reader.h"

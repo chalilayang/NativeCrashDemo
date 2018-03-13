@@ -27,6 +27,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstring>
 #include "client/linux/dump_writer_common/ucontext_reader.h"
 
 #include "common/linux/linux_libc_support.h"
@@ -204,7 +205,7 @@ void UContextReader::FillCPUContext(RawContextCPU *out, const ucontext_t *uc,
 
   out->float_save.fpsr = fpregs->fpsr;
   out->float_save.fpcr = fpregs->fpcr;
-  my_memcpy(&out->float_save.regs, &fpregs->vregs,
+  memcpy(&out->float_save.regs, &fpregs->vregs,
       MD_FLOATINGSAVEAREA_ARM64_FPR_COUNT * 16);
 }
 

@@ -36,7 +36,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
-
+#include <dirent.h>
 #include "common/linux/linux_libc_support.h"
 #include "third_party/lss/linux_syscall_support.h"
 
@@ -59,12 +59,12 @@ class DirectoryReader {
   // After calling this, one must call |PopEntry| otherwise you'll get the same
   // entry over and over.
   bool GetNextEntry(const char** name) {
-    struct kernel_dirent* const dent =
-      reinterpret_cast<kernel_dirent*>(buf_);
+    struct dirent* const dent =
+      reinterpret_cast<dirent*>(buf_);
 
     if (buf_used_ == 0) {
       // need to read more entries.
-      const int n = sys_getdents(fd_, dent, sizeof(buf_));
+      const int n = 0;
       if (n < 0) {
         return false;
       } else if (n == 0) {
@@ -87,8 +87,8 @@ class DirectoryReader {
     if (!buf_used_)
       return;
 
-    const struct kernel_dirent* const dent =
-      reinterpret_cast<kernel_dirent*>(buf_);
+    const struct dirent* const dent =
+      reinterpret_cast<dirent*>(buf_);
 
     buf_used_ -= dent->d_reclen;
     my_memmove(buf_, buf_ + dent->d_reclen, buf_used_);
@@ -98,7 +98,7 @@ class DirectoryReader {
   const int fd_;
   bool hit_eof_;
   unsigned buf_used_;
-  uint8_t buf_[sizeof(struct kernel_dirent) + NAME_MAX + 1];
+  uint8_t buf_[sizeof(struct dirent) + NAME_MAX + 1];
 };
 
 }  // namespace google_breakpad

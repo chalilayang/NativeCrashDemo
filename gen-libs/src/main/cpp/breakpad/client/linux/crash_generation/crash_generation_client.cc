@@ -34,6 +34,8 @@
 #include <sys/types.h>
 
 #include <algorithm>
+#include <unistd.h>
+#include <third_party/lss/linux_syscall_support.h>
 
 #include "common/linux/eintr_wrapper.h"
 #include "common/linux/ignore_ret.h"
@@ -50,15 +52,15 @@ class CrashGenerationClientImpl : public CrashGenerationClient {
 
   virtual bool RequestDump(const void* blob, size_t blob_size) {
     int fds[2];
-    if (sys_pipe(fds) < 0)
+    if (pipe(fds) < 0)
       return false;
     static const unsigned kControlMsgSize = CMSG_SPACE(sizeof(int));
 
-    struct kernel_iovec iov;
+    struct iovec iov;
     iov.iov_base = const_cast<void*>(blob);
     iov.iov_len = blob_size;
 
-    struct kernel_msghdr msg = { 0 };
+    struct msghdr msg = { 0 };
     msg.msg_iov = &iov;
     msg.msg_iovlen = 1;
     char cmsg[kControlMsgSize] = "";
@@ -72,17 +74,17 @@ class CrashGenerationClientImpl : public CrashGenerationClient {
     int* p = reinterpret_cast<int*>(CMSG_DATA(hdr));
     *p = fds[1];
 
-    ssize_t ret = HANDLE_EINTR(sys_sendmsg(server_fd_, &msg, 0));
-    sys_close(fds[1]);
+    ssize_t ret = HANDLE_EINTR(sendmsg(server_fd_, &msg, 0));
+    close(fds[1]);
     if (ret < 0) {
-      sys_close(fds[0]);
+      close(fds[0]);
       return false;
     }
 
     // Wait for an ACK from the server.
     char b;
-    IGNORE_RET(HANDLE_EINTR(sys_read(fds[0], &b, 1)));
-    sys_close(fds[0]);
+    IGNORE_RET(HANDLE_EINTR(read(fds[0], &b, 1)));
+    close(fds[0]);
 
     return true;
   }

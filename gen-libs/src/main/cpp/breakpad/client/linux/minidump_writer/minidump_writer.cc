@@ -1065,15 +1065,15 @@ class MinidumpWriter {
       CpuSet cpus_present;
       CpuSet cpus_possible;
 
-      int fd = sys_open("/sys/devices/system/cpu/present", O_RDONLY, 0);
+      int fd = open("/sys/devices/system/cpu/present", O_RDONLY, 0);
       if (fd >= 0) {
         cpus_present.ParseSysFile(fd);
-        sys_close(fd);
+        close(fd);
 
-        fd = sys_open("/sys/devices/system/cpu/possible", O_RDONLY, 0);
+        fd = open("/sys/devices/system/cpu/possible", O_RDONLY, 0);
         if (fd >= 0) {
           cpus_possible.ParseSysFile(fd);
-          sys_close(fd);
+          close(fd);
 
           cpus_present.IntersectWith(cpus_possible);
           int cpu_count = cpus_present.GetCount();
@@ -1089,7 +1089,7 @@ class MinidumpWriter {
     // read /proc/self/auxv but unfortunately, this file is not always
     // readable from regular Android applications on later versions
     // (>= 4.1) of the Android platform.
-    const int fd = sys_open("/proc/cpuinfo", O_RDONLY, 0);
+    const int fd = open("/proc/cpuinfo", O_RDONLY, 0);
     if (fd < 0) {
       // Do not return false here to allow the minidump generation
       // to happen properly.
@@ -1191,7 +1191,7 @@ class MinidumpWriter {
           }
         }
       }
-      sys_close(fd);
+      close(fd);
     }
 
     return true;
@@ -1201,7 +1201,7 @@ class MinidumpWriter {
 #endif
 
   bool WriteFile(MDLocationDescriptor* result, const char* filename) {
-    const int fd = sys_open(filename, O_RDONLY, 0);
+    const int fd = open(filename, O_RDONLY, 0);
     if (fd < 0)
       return false;
 
@@ -1221,7 +1221,7 @@ class MinidumpWriter {
     for (Buffers* bufptr = buffers;;) {
       ssize_t r;
       do {
-        r = sys_read(fd, &bufptr->data[bufptr->len], kBufSize - bufptr->len);
+        r = read(fd, &bufptr->data[bufptr->len], kBufSize - bufptr->len);
       } while (r == -1 && errno == EINTR);
 
       if (r < 1)
@@ -1236,7 +1236,7 @@ class MinidumpWriter {
         bufptr->len = 0;
       }
     }
-    sys_close(fd);
+    close(fd);
 
     if (!total)
       return false;

@@ -43,6 +43,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "client/linux/minidump_writer/line_reader.h"
 #include "common/linux/elfutils.h"
@@ -324,7 +325,7 @@ LinuxDumper::ElfFileIdentifierForMapping(const MappingInfo& mapping,
   // Special-case linux-gate because it's not a real file.
   if (my_strcmp(mapping.name, kLinuxGateLibraryName) == 0) {
     void* linux_gate = NULL;
-    if (pid_ == sys_getpid()) {
+    if (pid_ == getpid()) {
       linux_gate = reinterpret_cast<void*>(mapping.start_addr);
     } else {
       linux_gate = allocator_.Alloc(mapping.size);
@@ -544,14 +545,14 @@ bool LinuxDumper::ReadAuxv() {
     return false;
   }
 
-  int fd = sys_open(auxv_path, O_RDONLY, 0);
+  int fd = open(auxv_path, O_RDONLY, 0);
   if (fd < 0) {
     return false;
   }
 
   elf_aux_entry one_aux_entry;
   bool res = false;
-  while (sys_read(fd,
+  while (read(fd,
                   &one_aux_entry,
                   sizeof(elf_aux_entry)) == sizeof(elf_aux_entry) &&
          one_aux_entry.a_type != AT_NULL) {
@@ -560,7 +561,7 @@ bool LinuxDumper::ReadAuxv() {
       res = true;
     }
   }
-  sys_close(fd);
+  close(fd);
   return res;
 }
 
@@ -583,7 +584,7 @@ bool LinuxDumper::EnumerateMappings() {
   // actual entry point to find the mapping.
   const void* entry_point_loc = reinterpret_cast<void *>(auxv_[AT_ENTRY]);
 
-  const int fd = sys_open(maps_path, O_RDONLY, 0);
+  const int fd = open(maps_path, O_RDONLY, 0);
   if (fd < 0)
     return false;
   LineReader* const line_reader = new(allocator_) LineReader(fd);
@@ -667,7 +668,7 @@ bool LinuxDumper::EnumerateMappings() {
     }
   }
 
-  sys_close(fd);
+  close(fd);
 
   return !mappings_.empty();
 }
@@ -979,10 +980,10 @@ bool LinuxDumper::HandleDeletedFileInMapping(char* path) const {
     return false;
 
   // Check to see if someone actually named their executable 'foo (deleted)'.
-  struct kernel_stat exe_stat;
-  struct kernel_stat new_path_stat;
-  if (sys_stat(exe_link, &exe_stat) == 0 &&
-      sys_stat(new_path, &new_path_stat) == 0 &&
+  struct stat exe_stat;
+  struct stat new_path_stat;
+  if (stat(exe_link, &exe_stat) == 0 &&
+      stat(new_path, &new_path_stat) == 0 &&
       exe_stat.st_dev == new_path_stat.st_dev &&
       exe_stat.st_ino == new_path_stat.st_ino) {
     return false;
