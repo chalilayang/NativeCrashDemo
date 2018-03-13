@@ -1,4 +1,4 @@
-package chalilayang.com.nativelibrary;
+package com.chalilayang.nativelibrary;
 
 import org.junit.Test;
 

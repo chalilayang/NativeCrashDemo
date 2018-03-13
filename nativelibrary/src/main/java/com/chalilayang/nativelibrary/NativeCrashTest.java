@@ -1,4 +1,4 @@
-package chalilayang.com.nativelibrary;
+package com.chalilayang.nativelibrary;
 
 /**
  * Created by chalilayang on 2018/3/2.

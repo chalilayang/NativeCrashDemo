@@ -6,7 +6,7 @@ extern "C"
 JNIEXPORT jstring
 
 JNICALL
-Java_chalilayang_com_nativelibrary_NativeCrashTest_stringFromJNI(
+Java_com_chalilayang_nativelibrary_NativeCrashTest_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++ native";

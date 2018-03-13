@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import chalilayang.com.nativelibrary.NativeCrashTest;
+import com.chalilayang.nativelibrary.NativeCrashTest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+        tv.setText(new NativeCrashTest().stringFromJNI());
     }
 
     @Override
