@@ -70,7 +70,6 @@
 #include <linux/limits.h>
 #include <pthread.h>
 #include <sched.h>
-#include <signal.h>
 #include <stdio.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>

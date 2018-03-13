@@ -36,62 +36,62 @@
 namespace google_breakpad {
 
 //static
-const MinidumpDescriptor::MicrodumpOnConsole
-    MinidumpDescriptor::kMicrodumpOnConsole = {};
+    const MinidumpDescriptor::MicrodumpOnConsole
+            MinidumpDescriptor::kMicrodumpOnConsole = {};
 
-MinidumpDescriptor::MinidumpDescriptor(const MinidumpDescriptor& descriptor)
-    : mode_(descriptor.mode_),
-      fd_(descriptor.fd_),
-      directory_(descriptor.directory_),
-      c_path_(NULL),
-      size_limit_(descriptor.size_limit_),
-      address_within_principal_mapping_(
-          descriptor.address_within_principal_mapping_),
-      skip_dump_if_principal_mapping_not_referenced_(
-          descriptor.skip_dump_if_principal_mapping_not_referenced_),
-      sanitize_stacks_(descriptor.sanitize_stacks_),
-      microdump_extra_info_(descriptor.microdump_extra_info_) {
-  // The copy constructor is not allowed to be called on a MinidumpDescriptor
-  // with a valid path_, as getting its c_path_ would require the heap which
-  // can cause problems in compromised environments.
-  assert(descriptor.path_.empty());
-}
+    MinidumpDescriptor::MinidumpDescriptor(const MinidumpDescriptor &descriptor)
+            : mode_(descriptor.mode_),
+              fd_(descriptor.fd_),
+              directory_(descriptor.directory_),
+              c_path_(NULL),
+              size_limit_(descriptor.size_limit_),
+              address_within_principal_mapping_(
+                      descriptor.address_within_principal_mapping_),
+              skip_dump_if_principal_mapping_not_referenced_(
+                      descriptor.skip_dump_if_principal_mapping_not_referenced_),
+              sanitize_stacks_(descriptor.sanitize_stacks_),
+              microdump_extra_info_(descriptor.microdump_extra_info_) {
+        // The copy constructor is not allowed to be called on a MinidumpDescriptor
+        // with a valid path_, as getting its c_path_ would require the heap which
+        // can cause problems in compromised environments.
+        assert(descriptor.path_.empty());
+    }
 
-MinidumpDescriptor& MinidumpDescriptor::operator=(
-    const MinidumpDescriptor& descriptor) {
-  assert(descriptor.path_.empty());
+    MinidumpDescriptor &MinidumpDescriptor::operator=(
+            const MinidumpDescriptor &descriptor) {
+        assert(descriptor.path_.empty());
 
-  mode_ = descriptor.mode_;
-  fd_ = descriptor.fd_;
-  directory_ = descriptor.directory_;
-  path_.clear();
-  if (c_path_) {
-    // This descriptor already had a path set, so generate a new one.
-    c_path_ = NULL;
-    UpdatePath();
-  }
-  size_limit_ = descriptor.size_limit_;
-  address_within_principal_mapping_ =
-      descriptor.address_within_principal_mapping_;
-  skip_dump_if_principal_mapping_not_referenced_ =
-      descriptor.skip_dump_if_principal_mapping_not_referenced_;
-  sanitize_stacks_ = descriptor.sanitize_stacks_;
-  microdump_extra_info_ = descriptor.microdump_extra_info_;
-  return *this;
-}
+        mode_ = descriptor.mode_;
+        fd_ = descriptor.fd_;
+        directory_ = descriptor.directory_;
+        path_.clear();
+        if (c_path_) {
+            // This descriptor already had a path set, so generate a new one.
+            c_path_ = NULL;
+            UpdatePath();
+        }
+        size_limit_ = descriptor.size_limit_;
+        address_within_principal_mapping_ =
+                descriptor.address_within_principal_mapping_;
+        skip_dump_if_principal_mapping_not_referenced_ =
+                descriptor.skip_dump_if_principal_mapping_not_referenced_;
+        sanitize_stacks_ = descriptor.sanitize_stacks_;
+        microdump_extra_info_ = descriptor.microdump_extra_info_;
+        return *this;
+    }
 
-void MinidumpDescriptor::UpdatePath() {
-  assert(mode_ == kWriteMinidumpToFile && !directory_.empty());
+    void MinidumpDescriptor::UpdatePath() {
+        assert(mode_ == kWriteMinidumpToFile && !directory_.empty());
 
-  GUID guid;
-  char guid_str[kGUIDStringLength + 1];
-  if (!CreateGUID(&guid) || !GUIDToString(&guid, guid_str, sizeof(guid_str))) {
-    assert(false);
-  }
+        GUID guid;
+        char guid_str[kGUIDStringLength + 1];
+        if (!CreateGUID(&guid) || !GUIDToString(&guid, guid_str, sizeof(guid_str))) {
+            assert(false);
+        }
 
-  path_.clear();
-  path_ = directory_ + "/" + guid_str + ".dmp";
-  c_path_ = path_.c_str();
-}
+        path_.clear();
+        path_ = directory_ + "/" + guid_str + ".dmp";
+        c_path_ = path_.c_str();
+    }
 
 }  // namespace google_breakpad
