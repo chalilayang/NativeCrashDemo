@@ -3,8 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NativeCrashDemo.iml" filepath="$PROJECT_DIR$/NativeCrashDemo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/nativelibrary/nativelibrary.iml" filepath="$PROJECT_DIR$/nativelibrary/nativelibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gen-libs/gen-libs.iml" filepath="$PROJECT_DIR$/gen-libs/gen-libs.iml" />
     </modules>
   </component>
 </project>

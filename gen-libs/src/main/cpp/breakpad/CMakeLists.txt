@@ -36,3 +36,14 @@ find_library(
 target_link_libraries(
                        breakpad
                        ${log-lib} )
+
+add_library(
+             breakpadjni
+             SHARED
+             breakpad_jni.cpp
+)
+
+set_target_properties(breakpadjni
+                      PROPERTIES
+                      LIBRARY_OUTPUT_DIRECTORY
+                      "${distribution_DIR}/breakpad/lib/${ANDROID_ABI}")
