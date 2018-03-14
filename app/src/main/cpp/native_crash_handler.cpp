@@ -26,7 +26,7 @@ extern "C" {
 
 JNIEXPORT jint
 JNICALL
-Java_chalilayang_com_nativecrashdemo_NativeCrashHandler_createNativeException(JNIEnv *env,
+Java_com_chalilayang_nativecrashdemo_NativeCrashHandler_createNativeException(JNIEnv *env,
                                                                               jobject thiz) {
 //    if (coffeecatch_inside()) {
 //        LOG("coffeecatch_inside");

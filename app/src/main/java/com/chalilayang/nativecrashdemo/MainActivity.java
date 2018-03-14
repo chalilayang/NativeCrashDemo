@@ -1,4 +1,4 @@
-package chalilayang.com.nativecrashdemo;
+package com.chalilayang.nativecrashdemo;
 
 import android.os.Bundle;
 import android.util.Log;

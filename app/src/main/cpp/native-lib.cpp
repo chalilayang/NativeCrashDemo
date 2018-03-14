@@ -2,7 +2,7 @@
 #include <string>
 
 extern "C"
-JNIEXPORT jstring JNICALL Java_chalilayang_com_nativecrashdemo_MainActivity_stringFromJNI(
+JNIEXPORT jstring JNICALL Java_com_chalilayang_nativecrashdemo_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
 

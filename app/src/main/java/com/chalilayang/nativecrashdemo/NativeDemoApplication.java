@@ -1,4 +1,4 @@
-package chalilayang.com.nativecrashdemo;
+package com.chalilayang.nativecrashdemo;
 
 import android.app.ActivityManager;
 import android.app.Application;

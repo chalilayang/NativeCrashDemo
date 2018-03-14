@@ -30,4 +30,9 @@ set_target_properties(gmath
                       PROPERTIES
                       ARCHIVE_OUTPUT_DIRECTORY
                       "${distribution_DIR}/gmath/lib/${ANDROID_ABI}")
+add_custom_command(TARGET gmath POST_BUILD
+                   COMMAND "${CMAKE_COMMAND}" -E
+                   copy "${CMAKE_CURRENT_SOURCE_DIR}/src/gmath.h"
+                   "${distribution_DIR}/gmath/include/gmath.h"
+                   COMMENT "Copying gmath to output directory")
 

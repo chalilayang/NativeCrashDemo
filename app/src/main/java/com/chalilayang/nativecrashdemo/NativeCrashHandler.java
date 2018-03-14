@@ -1,4 +1,4 @@
-package chalilayang.com.nativecrashdemo;
+package com.chalilayang.nativecrashdemo;
 
 /**
  * Created by chalilayang on 2018/3/2.
