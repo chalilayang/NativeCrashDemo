@@ -38,8 +38,8 @@
 #include <list>
 #include <utility>
 
-#include "client/linux/minidump_writer/linux_dumper.h"
-#include "google_breakpad/common/minidump_format.h"
+#include "../minidump_writer/linux_dumper.h"
+#include "../../../google_breakpad/common/minidump_format.h"
 
 namespace google_breakpad {
 

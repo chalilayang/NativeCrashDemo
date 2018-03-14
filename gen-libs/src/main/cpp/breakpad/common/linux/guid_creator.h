@@ -30,7 +30,7 @@
 #ifndef COMMON_LINUX_GUID_CREATOR_H__
 #define COMMON_LINUX_GUID_CREATOR_H__
 
-#include "google_breakpad/common/minidump_format.h"
+#include "../../google_breakpad/common/minidump_format.h"
 
 typedef MDGUID GUID;
 

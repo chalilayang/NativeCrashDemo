@@ -42,7 +42,9 @@ add_library(
              SHARED
              breakpad_jni.cpp
 )
-
+target_include_directories(breakpad PUBLIC
+                           ${SRC_ROOT_DIR}/common/android/include
+                           ${SRC_ROOT_DIR})
 set_target_properties(breakpadjni
                       PROPERTIES
                       LIBRARY_OUTPUT_DIRECTORY

@@ -30,7 +30,7 @@
 #ifndef CLIENT_LINUX_DUMP_WRITER_COMMON_RAW_CONTEXT_CPU_H
 #define CLIENT_LINUX_DUMP_WRITER_COMMON_RAW_CONTEXT_CPU_H
 
-#include "google_breakpad/common/minidump_format.h"
+#include "../../../google_breakpad/common/minidump_format.h"
 
 namespace google_breakpad {
 

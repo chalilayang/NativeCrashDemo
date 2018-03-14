@@ -35,8 +35,8 @@
 
 #include <string>
 
-#include "client/linux/handler/microdump_extra_info.h"
-#include "common/using_std_string.h"
+#include "../../../common/using_std_string.h"
+#include "microdump_extra_info.h"
 
 // This class describes how a crash dump should be generated, either:
 // - Writing a full minidump to a file in a given directory (the actual path,

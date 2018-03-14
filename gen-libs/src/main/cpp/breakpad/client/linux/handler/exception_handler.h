@@ -37,12 +37,12 @@
 
 #include <string>
 
-#include "client/linux/crash_generation/crash_generation_client.h"
-#include "client/linux/handler/minidump_descriptor.h"
-#include "client/linux/minidump_writer/minidump_writer.h"
-#include "common/scoped_ptr.h"
-#include "common/using_std_string.h"
-#include "google_breakpad/common/minidump_format.h"
+#include "../crash_generation/crash_generation_client.h"
+#include "../handler/minidump_descriptor.h"
+#include "../minidump_writer/minidump_writer.h"
+#include "../../../common/scoped_ptr.h"
+#include "../../../common/using_std_string.h"
+#include "../../../google_breakpad/common/minidump_format.h"
 
 namespace google_breakpad {
 

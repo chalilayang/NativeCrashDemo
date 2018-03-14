@@ -33,9 +33,9 @@
 #include <sys/ucontext.h>
 #include <sys/user.h>
 
-#include "client/linux/dump_writer_common/raw_context_cpu.h"
-#include "common/memory_allocator.h"
-#include "google_breakpad/common/minidump_format.h"
+#include "raw_context_cpu.h"
+#include "../../../common/memory_allocator.h"
+#include "../../../google_breakpad/common/minidump_format.h"
 
 namespace google_breakpad {
 

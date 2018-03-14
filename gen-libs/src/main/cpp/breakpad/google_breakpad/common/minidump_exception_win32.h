@@ -41,7 +41,7 @@
 
 #include <stddef.h>
 
-#include "google_breakpad/common/breakpad_types.h"
+#include "breakpad_types.h"
 
 
 /* For (MDException).exception_code.  These values come from WinBase.h

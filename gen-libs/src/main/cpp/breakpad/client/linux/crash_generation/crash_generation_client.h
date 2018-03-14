@@ -30,7 +30,7 @@
 #ifndef CLIENT_LINUX_CRASH_GENERATION_CRASH_GENERATION_CLIENT_H_
 #define CLIENT_LINUX_CRASH_GENERATION_CRASH_GENERATION_CLIENT_H_
 
-#include "common/basictypes.h"
+#include "../../../common/basictypes.h"
 
 #include <stddef.h>
 
