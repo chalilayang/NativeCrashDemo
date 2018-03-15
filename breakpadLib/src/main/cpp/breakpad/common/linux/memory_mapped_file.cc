@@ -38,7 +38,6 @@
 #include <sys/stat.h>
 #endif
 #include <unistd.h>
-#include <third_party/lss/linux_syscall_support.h>
 
 #include "common/memory_range.h"
 

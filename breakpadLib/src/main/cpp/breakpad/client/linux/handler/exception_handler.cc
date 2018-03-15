@@ -86,7 +86,6 @@
 #include <utility>
 #include <vector>
 #include <cstring>
-#include <third_party/lss/linux_syscall_support.h>
 
 #include "common/basictypes.h"
 #include "common/linux/linux_libc_support.h"

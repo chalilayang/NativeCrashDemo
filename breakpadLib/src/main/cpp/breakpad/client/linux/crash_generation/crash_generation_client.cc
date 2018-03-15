@@ -35,11 +35,9 @@
 
 #include <algorithm>
 #include <unistd.h>
-#include <third_party/lss/linux_syscall_support.h>
 
 #include "common/linux/eintr_wrapper.h"
 #include "common/linux/ignore_ret.h"
-#include "third_party/lss/linux_syscall_support.h"
 
 namespace google_breakpad {
 

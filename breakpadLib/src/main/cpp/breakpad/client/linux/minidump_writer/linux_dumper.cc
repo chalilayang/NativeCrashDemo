@@ -52,7 +52,6 @@
 #include "common/linux/memory_mapped_file.h"
 #include "common/linux/safe_readlink.h"
 #include "google_breakpad/common/minidump_exception_linux.h"
-#include "third_party/lss/linux_syscall_support.h"
 
 #if defined(__ANDROID__)
 

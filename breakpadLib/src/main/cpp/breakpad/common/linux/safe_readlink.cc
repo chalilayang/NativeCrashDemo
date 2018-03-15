@@ -32,7 +32,6 @@
 
 #include <stddef.h>
 #include <sys/user.h>
-#include <third_party/lss/linux_syscall_support.h>
 #include <unistd.h>
 
 namespace google_breakpad {
