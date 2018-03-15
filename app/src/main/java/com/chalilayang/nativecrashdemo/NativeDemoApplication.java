@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import com.breakpad.BreakpadWrapper;
+
 /**
  * Created by chalilayang on 2018/3/2.
  */
@@ -13,6 +15,7 @@ public class NativeDemoApplication extends Application {
     private static final String TAG = NativeDemoApplication.class.getSimpleName();
 
     private NativeCrashHandler crashHandler;
+    private BreakpadWrapper breakpadWrapper;
 
     /**
      * Called when the application is starting, before any activity, service,
@@ -29,6 +32,8 @@ public class NativeDemoApplication extends Application {
         String processName = getCurrentProcessName();
         crashHandler = new NativeCrashHandler();
 //        crashHandler.initNativeHandler(android.os.Process.myPid());
+        breakpadWrapper = new BreakpadWrapper();
+        breakpadWrapper.initBreakpad();
         Log.i(TAG, "onCreate: " + processName);
     }
 

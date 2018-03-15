@@ -15,10 +15,11 @@ bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
 
 JNIEXPORT jint
 JNICALL
-Java_com_chalilayang_breakpad_BreakpadWrapper_initBreakpad(JNIEnv *env, jobject thiz) {
-    google_breakpad::MinidumpDescriptor rr;
-    google_breakpad::ExceptionHandler eh(rr, NULL, DumpCallback, NULL, true, -1);
-    google_breakpad::AppMemoryList list;
+Java_com_breakpad_BreakpadWrapper_initBreakpad(JNIEnv *env, jobject thiz) {
+    google_breakpad::MinidumpDescriptor descriptor(".");
+    google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback,
+                                         NULL, true, -1);
+    return 0;
 }
 
 #ifdef __cplusplus

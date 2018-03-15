@@ -85,12 +85,3 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        coffeecatch
                        ${log-lib} )
-
-add_library( # Sets the name of the library.
-             breakpad
-
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-             src/main/cpp/breakpad_jni.cpp )

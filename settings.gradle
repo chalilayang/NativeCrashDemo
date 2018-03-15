@@ -1,1 +1,1 @@
-include ":gen-libs"
+include ':app', ':breakpadLib', ':nativelibrary'

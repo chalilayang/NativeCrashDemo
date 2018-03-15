@@ -11,13 +11,17 @@ android {
 
         externalNativeBuild {
             cmake {
-                // explicitly build libs
-                targets 'gmath', 'gperf', 'breakpad'
+                targets 'breakpad'
             }
         }
         ndk {
             abiFilters "armeabi-v7a"
             abiFilters "arm64-v8a"
+        }
+    }
+    android {
+        sourceSets.main {
+            jniLibs.srcDir 'src/main/libs'
         }
     }
     buildTypes {

@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.4.1)
 set (CMAKE_CXX_STANDARD 11)
 set(SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(distribution_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../distribution)
+#设置生成的so动态库最后输出的路径
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../../jniLibs/${ANDROID_ABI})
 enable_language(ASM)
 add_library(
              breakpad
@@ -33,10 +34,10 @@ target_include_directories(breakpad PUBLIC
                            ${SRC_ROOT_DIR}/common/android/include
                            ${SRC_ROOT_DIR})
 
-set_target_properties(breakpad
-                      PROPERTIES
-                      LIBRARY_OUTPUT_DIRECTORY
-                      "${distribution_DIR}/breakpad/lib/${ANDROID_ABI}")
+#set_target_properties(breakpad
+#                      PROPERTIES
+#                      LIBRARY_OUTPUT_DIRECTORY
+#                      "${distribution_DIR}/breakpad/lib/${ANDROID_ABI}")
 find_library(
               log-lib
               log )
