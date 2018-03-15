@@ -31,8 +31,9 @@
 // See safe_readlink.h for details.
 
 #include <stddef.h>
-
-#include "third_party/lss/linux_syscall_support.h"
+#include <sys/user.h>
+#include <third_party/lss/linux_syscall_support.h>
+#include <unistd.h>
 
 namespace google_breakpad {
 
@@ -42,7 +43,7 @@ bool SafeReadLink(const char* path, char* buffer, size_t buffer_size) {
   // one byte longer than the expected path length. Also, sys_readlink()
   // returns the actual path length on success, which does not count the
   // NULL byte, so |result_size| should be less than |buffer_size|.
-  ssize_t result_size = sys_readlink(path, buffer, buffer_size);
+  ssize_t result_size = readlink(path, buffer, buffer_size);
   if (result_size >= 0 && static_cast<size_t>(result_size) < buffer_size) {
     buffer[result_size] = '\0';
     return true;

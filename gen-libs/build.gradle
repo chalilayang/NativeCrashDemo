@@ -12,7 +12,7 @@ android {
         externalNativeBuild {
             cmake {
                 // explicitly build libs
-                targets 'gmath', 'gperf', 'breakpad', 'breakpadjni'
+                targets 'gmath', 'gperf', 'breakpad'
             }
         }
         ndk {

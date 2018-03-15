@@ -38,9 +38,9 @@
 #include <sys/stat.h>
 #endif
 #include <unistd.h>
+#include <third_party/lss/linux_syscall_support.h>
 
 #include "common/memory_range.h"
-#include "third_party/lss/linux_syscall_support.h"
 
 namespace google_breakpad {
 
@@ -59,7 +59,7 @@ MemoryMappedFile::~MemoryMappedFile() {
 bool MemoryMappedFile::Map(const char* path, size_t offset) {
   Unmap();
 
-  int fd = sys_open(path, O_RDONLY, 0);
+  int fd = open(path, O_RDONLY, 0);
   if (fd == -1) {
     return false;
   }
@@ -67,13 +67,13 @@ bool MemoryMappedFile::Map(const char* path, size_t offset) {
 #if defined(__x86_64__) || defined(__aarch64__) || \
    (defined(__mips__) && _MIPS_SIM == _ABI64)
 
-  struct kernel_stat st;
-  if (sys_fstat(fd, &st) == -1 || st.st_size < 0) {
+  struct stat64 st;
+  if (fstat64(fd, &st) == -1 || st.st_size < 0) {
 #else
-  struct kernel_stat64 st;
-  if (sys_fstat64(fd, &st) == -1 || st.st_size < 0) {
+  struct stat st;
+  if (fstat(fd, &st) == -1 || st.st_size < 0) {
 #endif
-    sys_close(fd);
+    close(fd);
     return false;
   }
 
@@ -83,12 +83,12 @@ bool MemoryMappedFile::Map(const char* path, size_t offset) {
   // MemoryRange and return true. Don't bother to call mmap()
   // even though mmap() can handle an empty file on some platforms.
   if (offset >= file_len) {
-    sys_close(fd);
+    close(fd);
     return true;
   }
 
-  void* data = sys_mmap(NULL, file_len, PROT_READ, MAP_PRIVATE, fd, offset);
-  sys_close(fd);
+  void* data = mmap(NULL, file_len, PROT_READ, MAP_PRIVATE, fd, offset);
+  close(fd);
   if (data == MAP_FAILED) {
     return false;
   }
@@ -99,7 +99,7 @@ bool MemoryMappedFile::Map(const char* path, size_t offset) {
 
 void MemoryMappedFile::Unmap() {
   if (content_.data()) {
-    sys_munmap(const_cast<uint8_t*>(content_.data()), content_.length());
+    munmap(const_cast<uint8_t*>(content_.data()), content_.length());
     content_.Set(NULL, 0);
   }
 }
