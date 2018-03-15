@@ -5,8 +5,17 @@ package com.breakpad;
  */
 
 public class BreakpadWrapper {
-    static {
-        System.loadLibrary("breakpad");
+    private BreakpadWrapper() {
+    }
+    private static class Holder {
+        static {
+            System.loadLibrary("breakpad");
+        }
+        private static final BreakpadWrapper instance = new BreakpadWrapper();
+    }
+    public static BreakpadWrapper getInstance() {
+        return Holder.instance;
     }
     public native void initBreakpad();
+    public native void createCrash();
 }

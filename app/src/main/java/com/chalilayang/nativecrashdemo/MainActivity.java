@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.breakpad.BreakpadWrapper;
 import com.chalilayang.nativelibrary.NativeCrashTest;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,10 +33,16 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int dd = new NativeCrashHandler().createNativeException();
-                Log.i(TAG, "onClick: " + dd);
-                Snackbar.make(view, "Replace with your own action " + dd, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BreakpadWrapper.getInstance().createCrash();
+                    }
+                }).start();
+//                int dd = new NativeCrashHandler().createNativeException();
+//                Log.i(TAG, "onClick: " + dd);
+//                Snackbar.make(view, "Replace with your own action " + dd, Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
 

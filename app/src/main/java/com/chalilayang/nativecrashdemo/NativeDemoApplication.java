@@ -15,7 +15,6 @@ public class NativeDemoApplication extends Application {
     private static final String TAG = NativeDemoApplication.class.getSimpleName();
 
     private NativeCrashHandler crashHandler;
-    private BreakpadWrapper breakpadWrapper;
 
     /**
      * Called when the application is starting, before any activity, service,
@@ -32,8 +31,7 @@ public class NativeDemoApplication extends Application {
         String processName = getCurrentProcessName();
         crashHandler = new NativeCrashHandler();
 //        crashHandler.initNativeHandler(android.os.Process.myPid());
-        breakpadWrapper = new BreakpadWrapper();
-        breakpadWrapper.initBreakpad();
+        BreakpadWrapper.getInstance().initBreakpad();
         Log.i(TAG, "onCreate: " + processName);
     }
 
