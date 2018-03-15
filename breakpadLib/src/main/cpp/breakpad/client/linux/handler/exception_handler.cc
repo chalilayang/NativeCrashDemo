@@ -216,7 +216,7 @@ namespace google_breakpad {
         FirstChanceHandler g_first_chance_handler_ = nullptr;
     }  // namespace
 
-// Runs before crashing: normal context.
+    // Runs before crashing: normal context.
     ExceptionHandler::ExceptionHandler(const MinidumpDescriptor &descriptor,
                                        FilterCallback filter,
                                        MinidumpCallback callback,
@@ -228,17 +228,20 @@ namespace google_breakpad {
               callback_context_(callback_context),
               minidump_descriptor_(descriptor),
               crash_handler_(NULL) {
-        if (server_fd >= 0)
+        if (server_fd >= 0) {
             crash_generation_client_.reset(CrashGenerationClient::TryCreate(server_fd));
-
-        if (!IsOutOfProcess() && !minidump_descriptor_.IsFD() &&
-            !minidump_descriptor_.IsMicrodumpOnConsole())
+        }
+        if (!IsOutOfProcess()
+            && !minidump_descriptor_.IsFD()
+            && !minidump_descriptor_.IsMicrodumpOnConsole()) {
             minidump_descriptor_.UpdatePath();
+        }
 
-#if defined(__ANDROID__)
-        if (minidump_descriptor_.IsMicrodumpOnConsole())
+        #if defined(__ANDROID__)
+        if (minidump_descriptor_.IsMicrodumpOnConsole()) {
             logger::initializeCrashLogWriter();
-#endif
+        }
+        #endif
 
         pthread_mutex_lock(&g_handler_stack_mutex_);
 
@@ -246,8 +249,9 @@ namespace google_breakpad {
         // if handling an exception when the process ran out of virtual memory.
         memset(&g_crash_context_, 0, sizeof(g_crash_context_));
 
-        if (!g_handler_stack_)
+        if (!g_handler_stack_) {
             g_handler_stack_ = new std::vector<ExceptionHandler *>;
+        }
         if (install_handler) {
             InstallAlternateStackLocked();
             InstallHandlersLocked();
@@ -256,7 +260,6 @@ namespace google_breakpad {
         pthread_mutex_unlock(&g_handler_stack_mutex_);
     }
 
-// Runs before crashing: normal context.
     ExceptionHandler::~ExceptionHandler() {
         pthread_mutex_lock(&g_handler_stack_mutex_);
         std::vector<ExceptionHandler *>::iterator handler =
@@ -271,25 +274,24 @@ namespace google_breakpad {
         pthread_mutex_unlock(&g_handler_stack_mutex_);
     }
 
-// Runs before crashing: normal context.
-// static
     bool ExceptionHandler::InstallHandlersLocked() {
-        if (handlers_installed)
+        if (handlers_installed) {
             return false;
-
+        }
         // Fail if unable to store all the old handlers.
         for (int i = 0; i < kNumHandledSignals; ++i) {
-            if (sigaction(kExceptionSignals[i], NULL, &old_handlers[i]) == -1)
+            if (sigaction(kExceptionSignals[i], NULL, &old_handlers[i]) == -1) {
                 return false;
+            }
         }
-
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
         sigemptyset(&sa.sa_mask);
 
         // Mask all exception signals when we're handling one of them.
-        for (int i = 0; i < kNumHandledSignals; ++i)
+        for (int i = 0; i < kNumHandledSignals; ++i) {
             sigaddset(&sa.sa_mask, kExceptionSignals[i]);
+        }
 
         sa.sa_sigaction = SignalHandler;
         sa.sa_flags = SA_ONSTACK | SA_SIGINFO;
@@ -308,9 +310,9 @@ namespace google_breakpad {
 // Runs on the crashing thread.
 // static
     void ExceptionHandler::RestoreHandlersLocked() {
-        if (!handlers_installed)
+        if (!handlers_installed) {
             return;
-
+        }
         for (int i = 0; i < kNumHandledSignals; ++i) {
             if (sigaction(kExceptionSignals[i], &old_handlers[i], NULL) == -1) {
                 InstallDefaultHandler(kExceptionSignals[i]);
@@ -319,13 +321,6 @@ namespace google_breakpad {
         handlers_installed = false;
     }
 
-// void ExceptionHandler::set_crash_handler(HandlerCallback callback) {
-//   crash_handler_ = callback;
-// }
-
-// This function runs in a compromised context: see the top of the file.
-// Runs on the crashing thread.
-// static
     void ExceptionHandler::SignalHandler(int sig, siginfo_t *info, void *uc) {
 
         // Give the first chance handler a chance to recover from this signal
@@ -334,8 +329,7 @@ namespace google_breakpad {
         // safety in WebAssembly. This means some signals might be expected if they
         // originate from Wasm code while accessing the guard region. We give V8 the
         // chance to handle and recover from these signals first.
-        if (g_first_chance_handler_ != nullptr &&
-            g_first_chance_handler_(sig, info, uc)) {
+        if (g_first_chance_handler_ != nullptr && g_first_chance_handler_(sig, info, uc)) {
             return;
         }
 
