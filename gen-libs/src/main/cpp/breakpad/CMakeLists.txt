@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.4.1)
 set (CMAKE_CXX_STANDARD 11)
 set(SRC_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(distribution_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../distribution)
-enable_language(C ASM)
-set(CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS nasm asm S)
+enable_language(ASM)
 add_library(
              breakpad
              SHARED
