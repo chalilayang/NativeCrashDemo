@@ -95,6 +95,7 @@
 #include "client/linux/minidump_writer/linux_dumper.h"
 #include "client/linux/minidump_writer/minidump_writer.h"
 #include "common/linux/eintr_wrapper.h"
+#include "../../../../customlog.h"
 
 #if defined(__ANDROID__)
 
@@ -156,21 +157,22 @@ namespace google_breakpad {
             }
         }
 
-// Runs before crashing: normal context.
+        // Runs before crashing: normal context.
         void RestoreAlternateStackLocked() {
-            if (!stack_installed)
+            if (!stack_installed) {
                 return;
-
+            }
             stack_t current_stack;
-            if (sigaltstack(NULL, &current_stack) == -1)
+            if (sigaltstack(NULL, &current_stack) == -1) {
                 return;
-
+            }
             // Only restore the old_stack if the current alternative stack is the one
             // installed by the call to InstallAlternateStackLocked.
             if (current_stack.ss_sp == new_stack.ss_sp) {
                 if (old_stack.ss_sp) {
-                    if (sigaltstack(&old_stack, NULL) == -1)
+                    if (sigaltstack(&old_stack, NULL) == -1) {
                         return;
+                    }
                 } else {
                     stack_t disable_stack;
                     disable_stack.ss_flags = SS_DISABLE;
@@ -178,13 +180,12 @@ namespace google_breakpad {
                         return;
                 }
             }
-
             free(new_stack.ss_sp);
             stack_installed = false;
         }
 
         void InstallDefaultHandler(int sig) {
-#if defined(__ANDROID__)
+            #if defined(__ANDROID__)
             // Android L+ expose signal and sigaction symbols that override the system
             // ones. There is a bug in these functions where a request to set the handler
             // to SIG_DFL is ignored. In that case, an infinite loop is entered as the
@@ -196,21 +197,21 @@ namespace google_breakpad {
             sa.sa_handler = SIG_DFL;
             sa.sa_flags = SA_RESTART;
             sigaction(sig, &sa, NULL);
-#else
+            #else
             signal(sig, SIG_DFL);
-#endif
+            #endif
         }
 
-// The global exception handler stack. This is needed because there may exist
-// multiple ExceptionHandler instances in a process. Each will have itself
-// registered in this stack.
+        // The global exception handler stack. This is needed because there may exist
+        // multiple ExceptionHandler instances in a process. Each will have itself
+        // registered in this stack.
         std::vector<ExceptionHandler *> *g_handler_stack_ = NULL;
         pthread_mutex_t g_handler_stack_mutex_ = PTHREAD_MUTEX_INITIALIZER;
 
-// sizeof(CrashContext) can be too big w.r.t the size of alternatate stack
-// for SignalHandler(). Keep the crash context as a .bss field. Exception
-// handlers are serialized by the |g_handler_stack_mutex_| and at most one at a
-// time can use |g_crash_context_|.
+        // sizeof(CrashContext) can be too big w.r.t the size of alternatate stack
+        // for SignalHandler(). Keep the crash context as a .bss field. Exception
+        // handlers are serialized by the |g_handler_stack_mutex_| and at most one at a
+        // time can use |g_crash_context_|.
         ExceptionHandler::CrashContext g_crash_context_;
 
         FirstChanceHandler g_first_chance_handler_ = nullptr;
@@ -228,6 +229,7 @@ namespace google_breakpad {
               callback_context_(callback_context),
               minidump_descriptor_(descriptor),
               crash_handler_(NULL) {
+        LOGP("ExceptionHandler::ExceptionHandler pid %d", getpid());
         if (server_fd >= 0) {
             crash_generation_client_.reset(CrashGenerationClient::TryCreate(server_fd));
         }
@@ -306,9 +308,9 @@ namespace google_breakpad {
         return true;
     }
 
-// This function runs in a compromised context: see the top of the file.
-// Runs on the crashing thread.
-// static
+    // This function runs in a compromised context: see the top of the file.
+    // Runs on the crashing thread.
+    // static
     void ExceptionHandler::RestoreHandlersLocked() {
         if (!handlers_installed) {
             return;
@@ -411,21 +413,18 @@ namespace google_breakpad {
         size_t context_size;
     };
 
-// This is the entry function for the cloned process. We are in a compromised
-// context here: see the top of the file.
-// static
+    // This is the entry function for the cloned process. We are in a compromised
+    // context here: see the top of the file.
+    // static
     int ExceptionHandler::ThreadEntry(void *arg) {
         const ThreadArgument *thread_arg = reinterpret_cast<ThreadArgument *>(arg);
-
         // Close the write end of the pipe. This allows us to fail if the parent dies
         // while waiting for the continue signal.
         close(thread_arg->handler->fdes[1]);
-
         // Block here until the crashing process unblocks us when
         // we're allowed to use ptrace
         thread_arg->handler->WaitForContinueSignal();
         close(thread_arg->handler->fdes[0]);
-
         return thread_arg->handler->DoDump(thread_arg->pid, thread_arg->context,
                                            thread_arg->context_size) == false;
     }
@@ -433,13 +432,13 @@ namespace google_breakpad {
 // This function runs in a compromised context: see the top of the file.
 // Runs on the crashing thread.
     bool ExceptionHandler::HandleSignal(int /*sig*/, siginfo_t *info, void *uc) {
-        if (filter_ && !filter_(callback_context_))
+        LOG("ExceptionHandler::HandleSignal");
+        if (filter_ && !filter_(callback_context_)) {
             return false;
-
+        }
         // Allow ourselves to be dumped if the signal is trusted.
         bool signal_trusted = info->si_code > 0;
-        bool signal_pid_trusted = info->si_code == SI_USER ||
-                                  info->si_code == SI_TKILL;
+        bool signal_pid_trusted = info->si_code == SI_USER || info->si_code == SI_TKILL;
         if (signal_trusted || (signal_pid_trusted && info->si_pid == getpid())) {
             prctl(PR_SET_DUMPABLE, 1, 0, 0, 0);
         }
@@ -450,11 +449,9 @@ namespace google_breakpad {
         memcpy(&g_crash_context_.context, uc, sizeof(ucontext_t));
 #if defined(__aarch64__)
         ucontext_t *uc_ptr = (ucontext_t *) uc;
-        struct fpsimd_context *fp_ptr =
-                (struct fpsimd_context *) &uc_ptr->uc_mcontext.__reserved;
+        struct fpsimd_context *fp_ptr = (struct fpsimd_context *) &uc_ptr->uc_mcontext.__reserved;
         if (fp_ptr->head.magic == FPSIMD_MAGIC) {
-            memcpy(&g_crash_context_.float_state, fp_ptr,
-                   sizeof(g_crash_context_.float_state));
+            memcpy(&g_crash_context_.float_state, fp_ptr, sizeof(g_crash_context_.float_state));
         }
 #elif !defined(__ARM_EABI__) && !defined(__mips__)
         // FP state is not part of user ABI on ARM Linux.
@@ -468,8 +465,7 @@ namespace google_breakpad {
 #endif
         g_crash_context_.tid = syscall(__NR_gettid);
         if (crash_handler_ != NULL) {
-            if (crash_handler_(&g_crash_context_, sizeof(g_crash_context_),
-                               callback_context_)) {
+            if (crash_handler_(&g_crash_context_, sizeof(g_crash_context_), callback_context_)) {
                 return true;
             }
         }
@@ -489,18 +485,21 @@ namespace google_breakpad {
         return HandleSignal(sig, &siginfo, &context);
     }
 
-// This function may run in a compromised context: see the top of the file.
+    // This function may run in a compromised context: see the top of the file.
     bool ExceptionHandler::GenerateDump(CrashContext *context) {
-        if (IsOutOfProcess())
+        LOG("ExceptionHandler::GenerateDump");
+        if (IsOutOfProcess()) {
+            LOG("ExceptionHandler::GenerateDump IsOutOfProcess");
             return crash_generation_client_->RequestDump(context, sizeof(*context));
-
+        }
         // Allocating too much stack isn't a problem, and better to err on the side
         // of caution than smash it into random locations.
         static const unsigned kChildStackSize = 16000;
         PageAllocator allocator;
         uint8_t *stack = reinterpret_cast<uint8_t *>(allocator.Alloc(kChildStackSize));
-        if (!stack)
+        if (!stack) {
             return false;
+        }
         // clone() needs the top-most address. (scrub just to be safe)
         stack += kChildStackSize;
         my_memset(stack - 16, 0, 16);
@@ -531,14 +530,18 @@ namespace google_breakpad {
         }
 
         const pid_t child = clone(
-                ThreadEntry, stack, CLONE_FS | CLONE_UNTRACED, &thread_arg, NULL, NULL,
+                ThreadEntry,
+                stack,
+                CLONE_FS | CLONE_UNTRACED,
+                &thread_arg,
+                NULL,
+                NULL,
                 NULL);
         if (child == -1) {
             close(fdes[0]);
             close(fdes[1]);
             return false;
         }
-
         // Close the read end of the pipe.
         close(fdes[0]);
         // Allow the child to ptrace us
@@ -546,19 +549,26 @@ namespace google_breakpad {
         SendContinueSignalToChild();
         int status;
         const int r = HANDLE_EINTR(waitpid(child, &status, __WALL));
-
         close(fdes[1]);
-
         if (r == -1) {
             static const char msg[] = "ExceptionHandler::GenerateDump waitpid failed:";
             logger::write(msg, sizeof(msg) - 1);
             logger::write(strerror(errno), strlen(strerror(errno)));
             logger::write("\n", 1);
         }
-
         bool success = r != -1 && WIFEXITED(status) && WEXITSTATUS(status) == 0;
-        if (callback_)
+        if (r == -1) {
+            LOGE("r == -1");
+        }
+        if (!WIFEXITED(status)) {
+            LOGE("WIFEXITED(status) false");
+        }
+        if (WEXITSTATUS(status) != 0) {
+            LOGE("WEXITSTATUS(status) != 0");
+        }
+        if (callback_) {
             success = callback_(minidump_descriptor_, callback_context_, success);
+        }
         return success;
     }
 
@@ -591,16 +601,18 @@ namespace google_breakpad {
         }
     }
 
-// This function runs in a compromised context: see the top of the file.
-// Runs on the cloned process.
+    // This function runs in a compromised context: see the top of the file.
+    // Runs on the cloned process.
     bool ExceptionHandler::DoDump(pid_t crashing_process, const void *context,
                                   size_t context_size) {
+        LOG("ExceptionHandler::DoDump");
         const bool may_skip_dump =
                 minidump_descriptor_.skip_dump_if_principal_mapping_not_referenced();
         const uintptr_t principal_mapping_address =
                 minidump_descriptor_.address_within_principal_mapping();
         const bool sanitize_stacks = minidump_descriptor_.sanitize_stacks();
         if (minidump_descriptor_.IsMicrodumpOnConsole()) {
+            LOG("ExceptionHandler::DoDump -> google_breakpad::WriteMicrodump");
             return google_breakpad::WriteMicrodump(
                     crashing_process,
                     context,
@@ -612,6 +624,7 @@ namespace google_breakpad {
                     *minidump_descriptor_.microdump_extra_info());
         }
         if (minidump_descriptor_.IsFD()) {
+            LOG("ExceptionHandler::DoDump IsFD() -> google_breakpad::WriteMinidump");
             return google_breakpad::WriteMinidump(minidump_descriptor_.fd(),
                                                   minidump_descriptor_.size_limit(),
                                                   crashing_process,
@@ -623,6 +636,7 @@ namespace google_breakpad {
                                                   principal_mapping_address,
                                                   sanitize_stacks);
         }
+        LOG("ExceptionHandler::DoDump -> google_breakpad::WriteMinidump");
         return google_breakpad::WriteMinidump(minidump_descriptor_.path(),
                                               minidump_descriptor_.size_limit(),
                                               crashing_process,
