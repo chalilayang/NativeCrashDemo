@@ -33,12 +33,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        BreakpadWrapper.getInstance().createCrash();
-                    }
-                }).start();
+                BreakpadWrapper.getInstance().createCrash();
 //                int dd = new NativeCrashHandler().createNativeException();
 //                Log.i(TAG, "onClick: " + dd);
 //                Snackbar.make(view, "Replace with your own action " + dd, Snackbar.LENGTH_LONG)

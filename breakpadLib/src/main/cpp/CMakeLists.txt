@@ -24,5 +24,5 @@ set(lib_build_DIR $ENV{HOME}/tmp)
 
 #add_subdirectory(${lib_src_DIR}/gmath ${lib_build_DIR}/gmath)
 #add_subdirectory(${lib_src_DIR}/gperf ${lib_build_DIR}/gperf)
-add_subdirectory(${lib_src_DIR}/breakpad ${lib_build_DIR}/breakpad-master)
+add_subdirectory(${lib_src_DIR}/breakpad-master ${lib_build_DIR}/breakpad-master)
 
