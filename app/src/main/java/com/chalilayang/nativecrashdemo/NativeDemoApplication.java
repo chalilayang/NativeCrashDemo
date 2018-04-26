@@ -29,7 +29,7 @@ public class NativeDemoApplication extends Application {
     public void onCreate() {
         super.onCreate();
         String processName = getCurrentProcessName();
-        crashHandler = new NativeCrashHandler();
+//        crashHandler = new NativeCrashHandler();
 //        crashHandler.initNativeHandler(android.os.Process.myPid());
         BreakpadWrapper.getInstance().initBreakpad();
         Log.i(TAG, "onCreate: " + processName);

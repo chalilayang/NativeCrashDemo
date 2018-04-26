@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NativeCrashDemo.iml" filepath="$PROJECT_DIR$/NativeCrashDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/breakpadLib/breakpadLib.iml" filepath="$PROJECT_DIR$/breakpadLib/breakpadLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/breakpadLib/gen-libs.iml" filepath="$PROJECT_DIR$/breakpadLib/gen-libs.iml" />
       <module fileurl="file://$PROJECT_DIR$/nativelibrary/nativelibrary.iml" filepath="$PROJECT_DIR$/nativelibrary/nativelibrary.iml" />
     </modules>

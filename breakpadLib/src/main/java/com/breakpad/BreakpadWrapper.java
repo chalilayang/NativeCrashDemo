@@ -16,6 +16,6 @@ public class BreakpadWrapper {
     public static BreakpadWrapper getInstance() {
         return Holder.instance;
     }
-    public native void initBreakpad();
-    public native void createCrash();
+    public native int initBreakpad();
+    public native int createCrash();
 }

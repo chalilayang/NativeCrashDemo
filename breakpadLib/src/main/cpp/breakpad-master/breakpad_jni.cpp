@@ -24,6 +24,11 @@ bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
     return succeeded;
 }
 
+bool FilterCallback(void *context) {
+    LOG("FilterCallback");
+    return true;
+}
+
 JNIEXPORT jint
 JNICALL
 Java_com_breakpad_BreakpadWrapper_createCrash(JNIEnv *env, jobject thiz) {
@@ -43,7 +48,7 @@ Java_com_breakpad_BreakpadWrapper_initBreakpad(JNIEnv *env, jobject thiz) {
         descriptor = new google_breakpad::MinidumpDescriptor("./breakpad");
     }
     if (eh == nullptr) {
-        eh = new google_breakpad::ExceptionHandler(*descriptor, NULL, DumpCallback, NULL, true, -1);
+        eh = new google_breakpad::ExceptionHandler(*descriptor, FilterCallback, DumpCallback, NULL, true, 1);
     }
     return 0;
 }
