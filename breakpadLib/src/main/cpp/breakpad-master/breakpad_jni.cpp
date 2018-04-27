@@ -48,7 +48,8 @@ Java_com_breakpad_BreakpadWrapper_initBreakpad(JNIEnv *env, jobject thiz) {
         descriptor = new google_breakpad::MinidumpDescriptor("./breakpad");
     }
     if (eh == nullptr) {
-        eh = new google_breakpad::ExceptionHandler(*descriptor, FilterCallback, DumpCallback, NULL, true, 1);
+        eh = new google_breakpad::ExceptionHandler(
+                *descriptor, FilterCallback, DumpCallback, NULL, true, 1);
     }
     return 0;
 }
